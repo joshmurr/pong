@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pong-JM</title>
+	<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+</head>
+<body>
+	<canvas id="canvas" width="600" height="300">
+		
+	</canvas>
+	
+	<script type="text/javascript">
+		var canvas, ctx;
+		var cx = 500, cy = 150, cr = 10;
+		var dx = 2, dy = 2;
+		var width, height;
+		var paddlex, paddley, paddlew, paddleh;
+		var upDown = downDown = false;
+		var canvasminy, canvasaxy;
+		var intervalId = 0;
+		
+		//libary ++
+		//setup
+		function init() {
+			canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+			width = canvas.width;
+			height = canvas.height;
+			intervalId = setInterval(draw, 10);
+			return intervalId;
+		}
+		
+		function mouse(){
+			canvasminy = canvas.offsetTop;
+			canvasmaxy = canvasminy + height;
+		}
+		
+		function onMouseMove(evt){
+			if(evt.pageY > canvasminy && evt.pageY < canvasmaxy) {
+				paddley = evt.pageY - canvasminy - paddleh/2;
+			}
+		}
+		
+		function onKeyDown(evt){
+			if(evt.keyCode == 38) upDown = true;
+			else if(evt.keyCode == 40) downDown = true;
+		}
+		
+		function onKeyUp(evt){
+			if(evt.keyCode == 38) upDown = false;
+			else if(evt.keyCode == 40) downDown = false;
+		}
+		
+		$(document).keydown(onKeyDown);
+		$(document).keyup(onKeyUp);
+		$(document).mousemove(onMouseMove);
+		
+		
+		function paddle(){
+			paddlex = 20; //constant
+			paddley = height/2; //mouseMovement
+			paddlew = 10;
+			paddleh = 80;
+		}
+		
+		function circle(x, y, r) {
+			ctx.fillStyle = "#FF0000";
+			ctx.beginPath();
+			ctx.arc(x,y,r,0,Math.PI*2,true);
+			ctx.closePath();
+			ctx.fill();
+		}
+		
+		function rect(x,y,w,h){
+			ctx.fillStyle = "#0000FF"
+			ctx.beginPath();
+			ctx.rect(x,y,w,h);
+			ctx.closePath();
+			ctx.fill();
+		}
+		
+		function clear(){
+			ctx.fillStyle = "#AAFFAA";
+			ctx.rect(0,0,width,height);
+			ctx.fill();
+		}
+		//library --
+		
+		//draw
+		function draw(){
+			clear();
+			circle(cx,cy,cr);
+			if(upDown) paddley -= 10;
+			else if(downDown) paddley += 10;
+			rect(paddlex, paddley, paddlew, paddleh);
+			if(cx + dx > width) dx = -dx;
+			if(cy + dy > height || cy + dy < 0) dy = -dy;
+			else if(cx + dx < paddlex+paddlew+cr) {
+				if(cy > paddley && cy < paddley+paddleh) dx = -dx;
+				else if(cx + dx < 0) clearInterval(intervalId);
+			}
+			cx += dx;
+			cy += dy;
+		}
+		
+		init();
+		paddle();
+		mouse();
+	</script>
+	
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+</body>
+</html>
