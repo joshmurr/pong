@@ -11,10 +11,11 @@
 	
 	<script type="text/javascript">
 		var canvas, ctx;
-		var cx = 500, cy = 150, cr = 10;
+		var cx = 300, cy = 150, cr = 10;
 		var dx = 2, dy = 2;
 		var width, height;
 		var paddlex, paddley, paddlew, paddleh;
+		var enemyPaddlex, enemyPaddley;
 		var upDown = downDown = false;
 		var canvasminy, canvasaxy;
 		var intervalId = 0;
@@ -26,6 +27,7 @@
 			ctx = canvas.getContext("2d");
 			width = canvas.width;
 			height = canvas.height;
+			enemyPaddley = cy;
 			intervalId = setInterval(draw, 10);
 			return intervalId;
 		}
@@ -50,18 +52,23 @@
 			if(evt.keyCode == 38) upDown = false;
 			else if(evt.keyCode == 40) downDown = false;
 		}
-		
-		$(document).keydown(onKeyDown);
-		$(document).keyup(onKeyUp);
-		$(document).mousemove(onMouseMove);
-		
-		
+				
 		function paddle(){
 			paddlex = 20; //constant
 			paddley = height/2; //mouseMovement
 			paddlew = 10;
 			paddleh = 80;
 		}
+		
+		function enemyPaddle(){
+			function gety(){
+				return cy-(paddleh/2);
+			}
+			enemyPaddlex = width-(20+paddlew); //constant
+			enemyPaddley = gety(); //changes	
+		}	
+		
+				
 		
 		function circle(x, y, r) {
 			ctx.fillStyle = "#FF0000";
@@ -71,8 +78,8 @@
 			ctx.fill();
 		}
 		
-		function rect(x,y,w,h){
-			ctx.fillStyle = "#0000FF"
+		function rect(x,y,w,h, col){
+			ctx.fillStyle = "#" + col;
 			ctx.beginPath();
 			ctx.rect(x,y,w,h);
 			ctx.closePath();
@@ -80,27 +87,45 @@
 		}
 		
 		function clear(){
-			ctx.fillStyle = "#AAFFAA";
+			ctx.fillStyle = "#AAFFFF";
 			ctx.rect(0,0,width,height);
 			ctx.fill();
 		}
+		
+		function reset() {
+			draw();
+		}
+		
+		$(document).keydown(onKeyDown);
+		$(document).keyup(onKeyUp);
+		$(document).mousemove(onMouseMove);
 		//library --
 		
 		//draw
 		function draw(){
 			clear();
+			rect(enemyPaddlex, enemyPaddley, paddlew, paddleh, "00C0FF"); //NET
 			circle(cx,cy,cr);
 			if(upDown) paddley -= 10;
 			else if(downDown) paddley += 10;
-			rect(paddlex, paddley, paddlew, paddleh);
-			if(cx + dx > width) dx = -dx;
-			if(cy + dy > height || cy + dy < 0) dy = -dy;
-			else if(cx + dx < paddlex+paddlew+cr) {
+			rect(paddlex, paddley, paddlew, paddleh, "00C0FF");
+			rect(width/2, 4, 2, height-8, "FFFFFF");
+			if(cy + dy > height || cy + dy < 0) dy = -dy; //Bounce off top and bottom
+			if(cx + dx > enemyPaddlex-cr){
+				if(cy > enemyPaddley && cy < enemyPaddley+paddleh) dx = -dx;
+				else if(cx + dx > width) {
+					clearInterval(intervalId);
+				}
+			} 
+			if(cx + dx < paddlex+paddlew+cr) {
 				if(cy > paddley && cy < paddley+paddleh) dx = -dx;
-				else if(cx + dx < 0) clearInterval(intervalId);
+				else if(cx + dx < 0 ) {
+					clearInterval(intervalId);
+				}
 			}
 			cx += dx;
 			cy += dy;
+			enemyPaddle();
 		}
 		
 		init();
