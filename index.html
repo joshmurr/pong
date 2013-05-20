@@ -3,6 +3,12 @@
 <head>
 	<title>Pong-JM</title>
 	<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+	<style type="text/css">
+		@font-face{
+			font-family: pixel;
+			src: url('slkscr.ttf');
+		}
+	</style>
 </head>
 <body>
 	<canvas id="canvas" width="600" height="300">
@@ -18,6 +24,7 @@
 		var enemyPaddlex, enemyPaddley;
 		var upDown = downDown = false;
 		var canvasminy, canvasaxy;
+		var playerScore = enemyScore = 0;
 		var intervalId = 0;
 		
 		//libary ++
@@ -52,6 +59,10 @@
 			if(evt.keyCode == 38) upDown = false;
 			else if(evt.keyCode == 40) downDown = false;
 		}
+		
+		function onMouseClick(){
+			start();
+		}
 				
 		function paddle(){
 			paddlex = 20; //constant
@@ -68,7 +79,12 @@
 			enemyPaddley = gety(); //changes	
 		}	
 		
-				
+		function scores(){
+			ctx.fillStyle = "#000";
+			ctx.font = "12px pixel"
+			ctx.fillText(playerScore, 2*width/6, 20);
+			ctx.fillText(enemyScore, 4*width/6, 20);
+		}	
 		
 		function circle(x, y, r) {
 			ctx.fillStyle = "#FF0000";
@@ -93,12 +109,19 @@
 		}
 		
 		function reset() {
-			draw();
+			circle(width/2, height/2, 50);
+			cx = 300, cy = 150, cr = 10;
+			paddley = enemyPaddley = height/2;
+		}
+		
+		function start(){
+			init();
 		}
 		
 		$(document).keydown(onKeyDown);
 		$(document).keyup(onKeyUp);
 		$(document).mousemove(onMouseMove);
+		$(document).click(onMouseClick);
 		//library --
 		
 		//draw
@@ -114,23 +137,29 @@
 			if(cx + dx > enemyPaddlex-cr){
 				if(cy > enemyPaddley && cy < enemyPaddley+paddleh) dx = -dx;
 				else if(cx + dx > width) {
+					playerScore++;
+					reset();
 					clearInterval(intervalId);
 				}
 			} 
 			if(cx + dx < paddlex+paddlew+cr) {
 				if(cy > paddley && cy < paddley+paddleh) dx = -dx;
 				else if(cx + dx < 0 ) {
+					enemyScore++;
+					reset();
 					clearInterval(intervalId);
 				}
 			}
 			cx += dx;
 			cy += dy;
 			enemyPaddle();
+			scores();
 		}
 		
 		init();
 		paddle();
 		mouse();
+		
 	</script>
 	
 	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
