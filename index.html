@@ -18,7 +18,7 @@
 	<script type="text/javascript">
 		var canvas, ctx;
 		var cx = 300, cy = 150, cr = 10;
-		var dx = 2, dy = 2;
+		var dx = dy = -2;
 		var width, height;
 		var paddlex, paddley, paddlew, paddleh;
 		var enemyPaddlex, enemyPaddley;
@@ -72,16 +72,23 @@
 		}
 		
 		function enemyPaddle(){
-			function gety(){
-				return cy-(paddleh/2);
+			enemyPaddlex = width-30;
+			var paddlepos = enemyPaddley + paddleh/2;
+			var enemydy = 1;
+			if(dx < 0){
+				if(paddlepos < height/2 - 5) enemyPaddley += enemydy;
+				else if(paddlepos > height/2 + 5) enemyPaddley -= enemydy;
+			} else if(dx > 0) {
+				if(paddlepos != cy){
+					if(paddlepos < cy) enemyPaddley += enemydy;
+					else if(paddlepos > cy) enemyPaddley -= enemydy;
+				}
 			}
-			enemyPaddlex = width-(20+paddlew); //constant
-			enemyPaddley = gety(); //changes	
 		}	
 		
 		function scores(){
 			ctx.fillStyle = "#000";
-			ctx.font = "12px pixel"
+			ctx.font = "12px sans-serif"
 			ctx.fillText(playerScore, 2*width/6, 20);
 			ctx.fillText(enemyScore, 4*width/6, 20);
 		}	
@@ -127,12 +134,12 @@
 		//draw
 		function draw(){
 			clear();
-			rect(enemyPaddlex, enemyPaddley, paddlew, paddleh, "00C0FF"); //NET
 			circle(cx,cy,cr);
-			if(upDown) paddley -= 10;
-			else if(downDown) paddley += 10;
+			if(upDown) paddley -= 5;
+			else if(downDown) paddley += 5;
 			rect(paddlex, paddley, paddlew, paddleh, "00C0FF");
 			rect(width/2, 4, 2, height-8, "FFFFFF");
+			rect(enemyPaddlex, enemyPaddley, paddlew, paddleh, "00C0FF"); //NET
 			if(cy + dy > height || cy + dy < 0) dy = -dy; //Bounce off top and bottom
 			if(cx + dx > enemyPaddlex-cr){
 				if(cy > enemyPaddley && cy < enemyPaddley+paddleh) dx = -dx;
@@ -155,11 +162,9 @@
 			enemyPaddle();
 			scores();
 		}
-		
 		init();
 		paddle();
 		mouse();
-		
 	</script>
 	
 	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
