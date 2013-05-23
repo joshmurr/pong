@@ -11,20 +11,18 @@
 	</style>
 </head>
 <body>
-	<canvas id="canvas" width="600" height="300">
-		
-	</canvas>
-	
+	<canvas id="canvas" width="600" height="300"></canvas>
 	<script type="text/javascript">
 		var canvas, ctx;
 		var cx = 300, cy = 150, cr = 10;
-		var dx = dy = -2;
 		var width, height;
 		var paddlex, paddley, paddlew, paddleh;
 		var enemyPaddlex, enemyPaddley;
 		var upDown = downDown = false;
 		var canvasminy, canvasaxy;
 		var playerScore = enemyScore = 0;
+		var level = 1;
+		var dx = dy = -2;
 		var intervalId = 0;
 		
 		//libary ++
@@ -74,7 +72,7 @@
 		function enemyPaddle(){
 			enemyPaddlex = width-30;
 			var paddlepos = enemyPaddley + paddleh/2;
-			var enemydy = 1;
+			var enemydy = level/2.2;
 			if(dx < 0){
 				if(paddlepos < height/2 - 5) enemyPaddley += enemydy;
 				else if(paddlepos > height/2 + 5) enemyPaddley -= enemydy;
@@ -86,12 +84,62 @@
 			}
 		}	
 		
+		function updateDxDy() {
+			var mult = 1;
+			if(Math.random()) mult = -mult;
+			dx = dy = mult*level*1.7;
+		}
+		
 		function scores(){
 			ctx.fillStyle = "#000";
 			ctx.font = "12px sans-serif"
 			ctx.fillText(playerScore, 2*width/6, 20);
 			ctx.fillText(enemyScore, 4*width/6, 20);
+			ctx.fillText("Level " + level, width/2-15, 20);
+			  if(playerScore >= 2 && level == 1) {
+			   	level = 2;
+			   	updateDxDy();
+			   	playerScore = 0;
+			   } else if(playerScore >=2 && level == 2) {
+			   	level = 3;
+			   	updateDxDy();
+			   	playerScore = 0;
+			   } else if(playerScore >=4 && level == 3){
+			   	level = 4;
+			   	updateDxDy();
+			   	playerScore = 0;
+			   } else if(playerScore >=5 && level == 4){
+			   	gameOver();
+		   }
 		}	
+		
+		function gameOver() {
+			console.log("GAMEOVER");
+		}
+		
+		function ball() {
+			
+			if(cy + dy > height || cy + dy < 0) dy = -dy; //Bounce off top and bottom
+			if(cx + dx > enemyPaddlex-cr){
+				if(cy > enemyPaddley && cy < enemyPaddley+paddleh) dx = -dx;
+				else if(cx + dx > width) {
+					playerScore++;
+					reset();
+					clearInterval(intervalId);
+				}
+			} 
+			if(cx + dx < paddlex+paddlew+cr) {
+				if(cy > paddley && cy < paddley+paddleh) dx = -dx;
+				else if(cx + dx < 0 ) {
+					enemyScore++;
+					reset();
+					clearInterval(intervalId);
+				}
+			}
+			cx += dx;
+			cy += dy;
+		}
+		
 		
 		function circle(x, y, r) {
 			ctx.fillStyle = "#FF0000";
@@ -140,25 +188,7 @@
 			rect(paddlex, paddley, paddlew, paddleh, "00C0FF");
 			rect(width/2, 4, 2, height-8, "FFFFFF");
 			rect(enemyPaddlex, enemyPaddley, paddlew, paddleh, "00C0FF"); //NET
-			if(cy + dy > height || cy + dy < 0) dy = -dy; //Bounce off top and bottom
-			if(cx + dx > enemyPaddlex-cr){
-				if(cy > enemyPaddley && cy < enemyPaddley+paddleh) dx = -dx;
-				else if(cx + dx > width) {
-					playerScore++;
-					reset();
-					clearInterval(intervalId);
-				}
-			} 
-			if(cx + dx < paddlex+paddlew+cr) {
-				if(cy > paddley && cy < paddley+paddleh) dx = -dx;
-				else if(cx + dx < 0 ) {
-					enemyScore++;
-					reset();
-					clearInterval(intervalId);
-				}
-			}
-			cx += dx;
-			cy += dy;
+			ball();
 			enemyPaddle();
 			scores();
 		}
