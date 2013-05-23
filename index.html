@@ -24,6 +24,7 @@
 		var level = 1;
 		var dx = dy = -2;
 		var intervalId = 0;
+		var paused = 0;
 		
 		//libary ++
 		//setup
@@ -59,7 +60,7 @@
 		}
 		
 		function onMouseClick(){
-			start();
+			if(paused) start();
 		}
 				
 		function paddle(){
@@ -97,24 +98,29 @@
 			ctx.fillText(enemyScore, 4*width/6, 20);
 			ctx.fillText("Level " + level, width/2-15, 20);
 			  if(playerScore >= 2 && level == 1) {
-			   	level = 2;
-			   	updateDxDy();
-			   	playerScore = 0;
+				  level = 2;
+				  updateDxDy();
+				  playerScore = 0;
 			   } else if(playerScore >=2 && level == 2) {
-			   	level = 3;
-			   	updateDxDy();
-			   	playerScore = 0;
+				   level = 3;
+				   updateDxDy();
+				   playerScore = 0;
 			   } else if(playerScore >=4 && level == 3){
-			   	level = 4;
-			   	updateDxDy();
-			   	playerScore = 0;
+				   level = 4;
+				   updateDxDy();
+				   playerScore = 0;
 			   } else if(playerScore >=5 && level == 4){
-			   	gameOver();
-		   }
-		}	
+				   gameOver();
+			   }
+			   if(enemyScore >= 5) gameOver();
+		   }	
 		
 		function gameOver() {
 			console.log("GAMEOVER");
+			playerScore = enemyScore = 0;
+			level = 1;
+			dx = dy = 2;
+			reset();			
 		}
 		
 		function ball() {
@@ -164,6 +170,7 @@
 		}
 		
 		function reset() {
+			paused = 1;
 			circle(width/2, height/2, 50);
 			cx = 300, cy = 150, cr = 10;
 			paddley = enemyPaddley = height/2;
@@ -181,6 +188,7 @@
 		
 		//draw
 		function draw(){
+			paused = 0;
 			clear();
 			circle(cx,cy,cr);
 			if(upDown) paddley -= 5;
