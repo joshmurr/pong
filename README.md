@@ -1,6 +1,11 @@
 Read Me
 ====
 
-Making my first game in Javascript: pong.
+Making my first game in Javascript: pong. Possibly an ongoing thing, I would like to add:
 
-A good game to start with as no doubt many aspiring game makers have done in the past. All development stages will be documented here.
+- Reasonably sophisticated AI
+- Particle Systems
+- Difficulty Levels
+- More as I think of/learn stuff
+
+Josh
